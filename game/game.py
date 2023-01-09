@@ -1,5 +1,11 @@
-board = ["#"]*9
-wincond = [
+import platform
+from ia import ia_choice
+from os import system
+
+DEFAULT_CHAR='#'
+PLAYER1_CHAR='X'
+PLAYER2_CHAR='O'
+WINCOND = [
         [0, 1, 2],
         [3, 4, 5],
         [6, 7, 8],
@@ -9,58 +15,71 @@ wincond = [
         [0, 4, 8],
         [2, 4, 6],
     ]
-gamestate=False
+
+POSSIBLE_KEYS= [str(i) for i in range(1,10)]
 
 def writeboard(board):
-
     print(f"{' '.join(map(str , board[:3]))}\n{' '.join(map(str , board[3:6]))}\n{' '.join(map(str , board[6:]))}")
 
-def checkwin(combs,check):
-    for i in combs:
-        points=0
-        for j in i:
-            if check[j]=='O':
-                points+=1
-            if check[j]=='X':
-                points+=1
-        if points==3:
-            print('Yes')
-            if i==['X','X','X']:
-                print('Wow! Player1 Wins!')
-            if i==['O','O','O']:
-                print('Wow! Player2 Wins!')
-            return True
-        if "#" not in board:
+def clean():
+    """
+    Clears the console
+    """
+    os_name = platform.system().lower()
+    if 'windows' in os_name:
+        system('cls')
+    else:
+        system('clear')
+
+def swap(player):
+    return PLAYER2_CHAR if player==PLAYER1_CHAR else PLAYER1_CHAR
+
+def checkwin(board):
+    for i in WINCOND:
+        if board[i[0]]==board[i[1]]==board[i[2]]!=DEFAULT_CHAR:
+            return board[i[0]]
+        return None
+
+def checkdraw(board):
+    return DEFAULT_CHAR not in board
+
+def main():
+    print('New Tic Tac Toe!')
+    board = [DEFAULT_CHAR]*9
+    player=PLAYER1_CHAR
+    while True:
+        winner=checkwin(board)
+        if winner:
+            print(f'Player {winner} Wins!')
+            restart= input('Play again (Y/N)?: ').upper()
+            if restart == 'Y':
+                main()
+            elif restart == 'N':
+                clean()
+                break
+            elif restart != 'Y' or 'N':
+                print('Yes or No (Y/N)?: ')
+                continue
+        if checkdraw(board):
             print('Draw!')
-            return True
-    return False
-        
-while gamestate == False:
+            restart= input('Play again (Y/N)?: ').upper()
+            if restart == 'Y':
+                main()
+            elif restart == 'N':
+                clean()
+                break
+            elif restart != 'Y' or 'N':
+                print('Yes or No (Y/N)?: ')
+                continue
+        key= input(f'Player {player} to play (Between 1-9): ')
+        if key not in POSSIBLE_KEYS:
+            print('Please enter a number between 1-9')
+            continue
+        if board[int(key)-1]!=DEFAULT_CHAR:
+            print('Please enter a legal move')
+            continue
+        board[int(key)-1]=player
+        player=swap(player)
+        writeboard(board)
 
-    validmove1=False
-    validmove2=False
-
-    print('Player1 ~X~ to play')
-    play= int(input('Please select a position [0-8] to play: '))
-    while validmove1==False:
-        while board[play]!="#":
-            print('WARNING! Please enter a position that was not already played')
-            play= int(input('Please select a position [0-8] to play: '))
-        board[play]='X'
-        validmove1=True
-    writeboard(board)
-
-    gamestate=checkwin(wincond,board)
-    if gamestate==True:
-        break
-
-    print('Player2 ~O~ to play')
-    play= int(input('Please select a position [0-8] to play: '))
-    while validmove2==False:
-        while board[play]!="#":
-            print('WARNING! Please enter a position that was not already played')
-            play= int(input('Please select a position [0-8] to play: '))
-        board[play]='O'
-        validmove2=True
-    writeboard(board)
-    gamestate=checkwin(wincond,board)
+main()
