@@ -21,16 +21,6 @@ POSSIBLE_KEYS= [str(i) for i in range(1,10)]
 def writeboard(board):
     print(f"{' '.join(map(str , board[:3]))}\n{' '.join(map(str , board[3:6]))}\n{' '.join(map(str , board[6:]))}")
 
-def clean():
-    """
-    Clears the console
-    """
-    os_name = platform.system().lower()
-    if 'windows' in os_name:
-        system('cls')
-    else:
-        system('clear')
-
 def swap(player):
     return PLAYER2_CHAR if player==PLAYER1_CHAR else PLAYER1_CHAR
 
@@ -38,7 +28,7 @@ def checkwin(board):
     for i in WINCOND:
         if board[i[0]]==board[i[1]]==board[i[2]]!=DEFAULT_CHAR:
             return board[i[0]]
-        return None
+    return None
 
 def checkdraw(board):
     return DEFAULT_CHAR not in board
@@ -49,24 +39,23 @@ def main():
     player=PLAYER1_CHAR
     while True:
         winner=checkwin(board)
-        if winner:
+        if winner:  
             print(f'Player {winner} Wins!')
             restart= input('Play again (Y/N)?: ').upper()
             if restart == 'Y':
                 main()
             elif restart == 'N':
-                clean()
                 break
             elif restart != 'Y' or 'N':
                 print('Yes or No (Y/N)?: ')
                 continue
+            break
         if checkdraw(board):
             print('Draw!')
             restart= input('Play again (Y/N)?: ').upper()
             if restart == 'Y':
                 main()
             elif restart == 'N':
-                clean()
                 break
             elif restart != 'Y' or 'N':
                 print('Yes or No (Y/N)?: ')
