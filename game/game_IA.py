@@ -31,57 +31,49 @@ def checkwin(board):
 def checkdraw(board):
     return DEFAULT_CHAR not in board
 
-def ia_choice(board):
-    print('IA plays')
+def ia_choice_random(board):
+    print('IA plays: Hahaha I am very very smart IA')
     return random.choice([i for i in range(9) if board[i]==DEFAULT_CHAR])
+
+def coinflip():
+    return random.choice([PLAYER1_CHAR, PLAYER2_CHAR])
+
+def play_again():
+    restart= input('Play again (Y/N)?: ').upper()
+    if restart == 'Y':
+        return True
+    elif restart == 'N':
+        return False
+    elif restart != 'Y' or 'N':
+        print('Yes or No (Y/N)?: ')
+        return play_again()
 
 def main():
     print('New Tic Tac Toe!')
     board = [DEFAULT_CHAR]*9
-    player=PLAYER1_CHAR
+    player = coinflip()
     while True:
-        winner=checkwin(board)
+        winner = checkwin(board)
         if winner:
             print(f'Player {winner} Wins!')
-            if winner==PLAYER1_CHAR:
-                print('You Win!')
-            else:
-                print('HAHAHAHAHAHAHHAHAHAHAHAH You Lose!')
-            restart= input('Play again (Y/N)?: ').upper()
-            if restart == 'Y':
-                main()
-            elif restart == 'N':
+            print(winner==PLAYER1_CHAR and 'You Win!' or 'You Lose!')
+            if not play_again():
                 break
-            elif restart != 'Y' or 'N':
-                print('Yes or No (Y/N)?: ')
-                continue
-        if checkdraw(board):
+            main()
+        elif checkdraw(board):
             print('Draw!')
-            restart= input('Play again (Y/N)?: ').upper()
-            if restart == 'Y':
-                main()
-            elif restart == 'N':
+            if not play_again():
                 break
-            elif restart != 'Y' or 'N':
-                print('Yes or No (Y/N)?: ')
+            main()
+        elif player == PLAYER2_CHAR:
+            key = ia_choice_random(board)
+        else:
+            key = input(f'Player {player} to play (Between 1-9): ')
+            if key not in POSSIBLE_KEYS or board[int(key)-1] != DEFAULT_CHAR:
+                print('Please enter a legal move')
                 continue
-        # ia plays
-        if player==PLAYER2_CHAR:
-            key=ia_choice(board)
-            board[key]=player
-            player=swap(player)
-            writeboard(board)
-        # player plays
-        key= input(f'Player {player} to play (Between 1-9): ')
-        if key not in POSSIBLE_KEYS:
-            print('Please enter a number between 1-9')
-            continue
-        if board[int(key)-1]!=DEFAULT_CHAR:
-            print('Please enter a legal move')
-            continue
-        board[int(key)-1]=player
-        player=swap(player)
+        board[int(key)-1] = player
+        player = swap(player)
         writeboard(board)
-
 
 main()
