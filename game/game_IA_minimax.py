@@ -150,7 +150,7 @@ def human_turn(computer_char, human_char):
             can_move = set_move(coord[0], coord[1], HUMAN)
 
             if not can_move:
-                print('Bad move, you stoopid')
+                print('Bad move, you ------')
                 move = -1
         except (EOFError, KeyboardInterrupt):
             print('\nBye ragequitter')
@@ -186,7 +186,7 @@ def main():
             print('Bye')
             exit()
         except (KeyError, ValueError):
-            print('Thats a yes/no question, are you stupid?')
+            print('Thats a yes/no question, are you -------?')
     while len(empty_cells(board)) > 0 and not game_over(board):
         if first == 'Y':
             ai_turn(computer_char, human_char)
@@ -199,7 +199,7 @@ def main():
         clear_term()
         print(f'Your turn insect [{human_char}]')
         render(board, computer_char, human_char)
-        print('IF you can read that, you cheated!')
+        print('If you can read that, you cheated!')
     elif wins(board, COMP):
         clear_term()
         print(f'My turn [{computer_char}]')
@@ -208,7 +208,7 @@ def main():
     else:
         clear_term()
         render(board, computer_char, human_char)
-        print('Nigger')
+        print('-----r')
 
     exit()
 
