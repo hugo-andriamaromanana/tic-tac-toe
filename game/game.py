@@ -1,76 +1,70 @@
-import random
+import curses
 
-DEFAULT_CHAR='#'
-PLAYER1_CHAR='X'
-PLAYER2_CHAR='O'
-WINCOND = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]]
-POSSIBLE_KEYS= [str(i) for i in range(1,10)]
+POSSIBLE_KEYS = [ord(str(i)) for i in range(1, 10)]
 
-def write_board(board):
-    print(f"{' '.join(map(str , board[:3]))}\n{' '.join(map(str , board[3:6]))}\n{' '.join(map(str , board[6:]))}")
+DEFAULT_CHAR = "#"
+X_CHAR = "X"
+O_CHAR = "O"
 
-def swap(player):
-    return PLAYER2_CHAR if player==PLAYER1_CHAR else PLAYER1_CHAR
+COMBS = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+]
+
+
+def write_board(stdscr, board):
+    line = 0
+    for i in range(2, -1, -1):
+        stdscr.addstr(line+1, 0, " ".join(board[i*3:(i+1)*3]))
+        line += 1
+
 
 def check_win(board):
-    for i in WINCOND:
-        if board[i[0]]==board[i[1]]==board[i[2]]!=DEFAULT_CHAR:
-            return board[i[0]]
+    for comb in COMBS:
+        if board[comb[0]] == board[comb[1]] == board[comb[2]] != DEFAULT_CHAR:
+            return board[comb[0]]
     return None
 
-def coin_flip():
-    return random.choice([PLAYER1_CHAR, PLAYER2_CHAR])
 
-def ia_choice(board):
-    return random.choice([i for i in range(1,10) if board[i]==DEFAULT_CHAR])
+def swap_player(player): return O_CHAR if player == X_CHAR else X_CHAR
 
-def check_draw(board):
-    return DEFAULT_CHAR not in board
-
-def play_again():
-    restart= input('Play again (Y/N)?: ').upper()
-    if restart == 'Y':
-        return True
-    elif restart == 'N':
-        return False
-    else:
-        print('Please enter Y or N')
-        return play_again()
-
-def play_turn(board, player):
-    key = input(f'Player {player} to play (Between 1-9): ')
-    if key not in POSSIBLE_KEYS or board[int(key)-1] != DEFAULT_CHAR:
-        print('Please enter a legal move')
-        play_turn(board, player)
-    board[int(key)-1] = player
-    write_board(board)
-
-def ia_turn(board, player):
-    key = ia_choice(board)
-    board[int(key)-1] = player
-    write_board(board)
 
 def main():
-    print('New Tic Tac Toe!')
+    stdscr = curses.initscr()
+    curses.curs_set(0)
     board = [DEFAULT_CHAR]*9
-    player=PLAYER1_CHAR
+    player = "X"
     while True:
-        winner=check_win(board)
+        write_board(stdscr, board)
+        winner = check_win(board)
+
         if winner:
-            print(f'Player {winner} Wins!')
-            if play_again():
-                main()
-            else:
-                break
-        elif check_draw(board):
-            print('Draw!')
-            if play_again():
-                main()
-            else:
-                break
-        if player==PLAYER1_CHAR:
-            ia_turn(board, player)
-        play_turn(board, player)
-        player = swap(player)
+            stdscr.addstr(5, 0, f"Player {winner} wins!\n")
+            stdscr.refresh()
+            break
+
+        player = swap_player(player)
+        stdscr.addstr(5, 0, f"Player {player} turn: ")
+        stdscr.refresh()
+
+        key = stdscr.getch()
+
+        if key == ord("q"):
+            stdscr.addstr(5, 0, "Bye bye!\n")
+            stdscr.refresh()
+            break
+
+        if key in POSSIBLE_KEYS and board[key - 49] == DEFAULT_CHAR:
+            board[key - 49] = player
+        else:
+            player = swap_player(player)
+            stdscr.refresh()
+
 
 main()
